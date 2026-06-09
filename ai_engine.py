@@ -1,7 +1,5 @@
 import google.generativeai as genai
 from config import GEMINI_API_KEY
-import io
-from PIL import Image
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -18,12 +16,3 @@ async def ask_ai(prompt, context=""):
         return response.text
     except Exception:
         return "Чёт туплю, повторил?"
-
-async def analyze_photo(image_bytes):
-    try:
-        img = Image.open(io.BytesIO(image_bytes))
-        prompt = "Опиши это фото для чата мотосообщества. Есть ли там мотоцикл (особенно Альфа)? Кто может быть на фото? Коротко, сленгом, как свой пацан."
-        response = model.generate_content([prompt, img])
-        return response.text
-    except Exception:
-        return "Крутой кадр 👍"

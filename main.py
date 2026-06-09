@@ -50,7 +50,7 @@ async def on_shutdown():
     await bot.session.close()    print("[OK] Bot session closed")
 
 # ==========================
-# [DM] ЛИЧКА
+# [DM] ЛИЧКА: ОБУЧЕНИЕ
 # ==========================
 @dp.message(Command("start"), F.chat.type == "private")
 async def start_private(message: types.Message):
@@ -135,19 +135,17 @@ async def group_chat_handler(message: types.Message):
         await message.reply(response)
 
 # ==========================
-# [PHOTO] ФОТО И ГЕОЛОКАЦИИ
+# [PHOTO] ФОТО (ВРЕМЕННО ОТКЛЮЧЕНО)
 # ==========================
-@dp.message(F.photo, F.chat.type.in_(["group", "supergroup"]))
-async def photo_handler(message: types.Message):
-    await db.save_context(message.chat.id, message.from_user.id, "[Прислал фото]")
-    file = await bot.get_file(message.photo[-1].file_id)
-    file_bytes = await bot.download_file(file.file_path)
-    description = await ai.analyze_photo(file_bytes.read())
-    await message.reply(description)
+# Анализ фото требует системных библиотек, которых нет на Render.
+# Включим позже, когда бот будет стабильно работать.
 
-@dp.message(F.location)async def location_handler(message: types.Message):
-    lat = message.location.latitude
-    lon = message.location.longitude
+# ==========================
+# [LOCATION] ГЕОЛОКАЦИИ
+# ==========================
+@dp.message(F.location)
+async def location_handler(message: types.Message):
+    lat = message.location.latitude    lon = message.location.longitude
     await db.save_place(f"Точка от {message.from_user.first_name}", lat, lon, "покатушки")
     await message.reply("Засёк координаты 📍 Сохранил в базу! Теперь все могут найти это место командой /places в личке.")
     
@@ -194,9 +192,9 @@ async def generate_idea(message: types.Message):
 # ==========================
 async def main():
     web_runner = await start_web_server()
-        try:
-        await dp.start_polling(bot)
-    finally:
+    
+    try:
+        await dp.start_polling(bot)    finally:
         await web_runner.cleanup()
 
 if __name__ == "__main__":
